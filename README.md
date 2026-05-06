@@ -15,6 +15,7 @@
 - валидация `OTP`
 - перевод просроченных кодов в статус `EXPIRED` по расписанию
 - сохранение сгенерированного кода в файл `otp-codes.txt`
+- отправка `OTP` по `Email`
 - логирование запросов
 
 ## Структура проекта
@@ -96,7 +97,7 @@ curl -X DELETE http://localhost:8080/admin/users/2 \
 
 ### 7. Сгенерировать OTP
 
-Пока рабочий канал только `FILE`.
+Сейчас доступны каналы `FILE` и `EMAIL`.
 
 ```bash
 curl -X POST http://localhost:8080/otp/generate \
@@ -106,6 +107,15 @@ curl -X POST http://localhost:8080/otp/generate \
 ```
 
 После этого код появится в файле `otp-codes.txt` в корне проекта.
+
+Пример отправки по `Email`:
+
+```bash
+curl -X POST http://localhost:8080/otp/generate \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"operationId":"payment-002","channel":"EMAIL","destination":"user@example.com"}'
+```
 
 ### 8. Валидировать OTP
 
@@ -133,3 +143,21 @@ curl -X POST http://localhost:8080/otp/validate \
 ```bash
 ./gradlew build
 ```
+
+## Настройка Email
+
+Перед использованием канала `EMAIL` заполнить файл [email.properties](/Users/nikolaj/IdeaProjects/specialized_tools_java/src/main/resources/email.properties):
+
+у меня отрабатывает только на мобильном интернете
+
+```properties
+email.username=your_email@example.com
+email.password=your_app_password
+email.from=your_email@example.com
+mail.smtp.host=smtp.example.com
+mail.smtp.port=587
+mail.smtp.auth=true
+mail.smtp.starttls.enable=true
+```
+
+Если файл не заполнен, приложение запустится, но отправка по `EMAIL` вернёт ошибку конфигурации.

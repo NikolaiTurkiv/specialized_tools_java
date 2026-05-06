@@ -1,7 +1,5 @@
 package org.example.service;
 
-import java.security.SecureRandom;
-import java.time.Instant;
 import org.example.dao.OtpCodeDao;
 import org.example.dao.OtpConfigDao;
 import org.example.dto.GenerateOtpRequest;
@@ -12,10 +10,12 @@ import org.example.exception.ApiException;
 import org.example.model.DeliveryChannel;
 import org.example.model.OtpCode;
 import org.example.model.OtpConfig;
-import org.example.model.OtpStatus;
 import org.example.notification.NotificationDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.security.SecureRandom;
+import java.time.Instant;
 
 public class OtpService {
     private static final Logger log = LoggerFactory.getLogger(OtpService.class);
@@ -44,6 +44,7 @@ public class OtpService {
         }
 
         DeliveryChannel channel = parseChannel(request.channel());
+        validateDestination(channel, request.destination());
         OtpConfig config = otpConfigDao.get();
         String code = generateNumericCode(config.codeLength());
         Instant expiresAt = Instant.now().plusSeconds(config.ttlSeconds());
@@ -104,6 +105,26 @@ public class OtpService {
         } catch (IllegalArgumentException e) {
             throw new ApiException(400, "channel must be EMAIL, SMS, TELEGRAM or FILE");
         }
+    }
+
+    private void validateDestination(DeliveryChannel channel, String destination) {
+        if (channel == DeliveryChannel.FILE) {
+            return;
+        }
+
+        if (destination == null || destination.isBlank()) {
+            throw new ApiException(400, "destination is required for channel " + channel.name());
+        }
+
+        if (channel == DeliveryChannel.EMAIL && !isValidEmail(destination)) {
+            throw new ApiException(400, "destination must be a valid email address");
+        }
+    }
+
+    private boolean isValidEmail(String value) {
+        int atIndex = value.indexOf('@');
+        int dotIndex = value.lastIndexOf('.');
+        return atIndex > 0 && dotIndex > atIndex + 1 && dotIndex < value.length() - 1;
     }
 
     private String generateNumericCode(int length) {

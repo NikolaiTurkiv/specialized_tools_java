@@ -1,19 +1,6 @@
 package org.example;
 
-import java.io.IOException;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import org.example.api.AdminConfigHandler;
-import org.example.api.AdminUsersHandler;
-import org.example.api.ApiServer;
-import org.example.api.GenerateOtpHandler;
-import org.example.api.HealthHandler;
-import org.example.api.LoginHandler;
-import org.example.api.RegisterHandler;
-import org.example.api.ValidateOtpHandler;
+import org.example.api.*;
 import org.example.config.AppConfig;
 import org.example.dao.OtpCodeDao;
 import org.example.dao.OtpConfigDao;
@@ -21,6 +8,7 @@ import org.example.dao.UserDao;
 import org.example.db.ConnectionFactory;
 import org.example.db.DatabaseInitializer;
 import org.example.model.DeliveryChannel;
+import org.example.notification.EmailNotificationSender;
 import org.example.notification.FileNotificationSender;
 import org.example.notification.NotificationDispatcher;
 import org.example.notification.NotificationSender;
@@ -31,6 +19,13 @@ import org.example.service.AuthService;
 import org.example.service.OtpService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class OtpApplication {
     private static final Logger log = LoggerFactory.getLogger(OtpApplication.class);
@@ -56,6 +51,7 @@ public class OtpApplication {
 
         Map<DeliveryChannel, NotificationSender> senders = new EnumMap<>(DeliveryChannel.class);
         senders.put(DeliveryChannel.FILE, new FileNotificationSender(config.otpOutputFile()));
+        senders.put(DeliveryChannel.EMAIL, new EmailNotificationSender());
         NotificationDispatcher notificationDispatcher = new NotificationDispatcher(senders);
 
         OtpService otpService = new OtpService(otpConfigDao, otpCodeDao, notificationDispatcher);
