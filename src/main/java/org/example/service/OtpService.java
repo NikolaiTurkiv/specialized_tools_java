@@ -119,12 +119,20 @@ public class OtpService {
         if (channel == DeliveryChannel.EMAIL && !isValidEmail(destination)) {
             throw new ApiException(400, "destination must be a valid email address");
         }
+
+        if (channel == DeliveryChannel.SMS && !isValidPhoneNumber(destination)) {
+            throw new ApiException(400, "destination must be a valid phone number");
+        }
     }
 
     private boolean isValidEmail(String value) {
         int atIndex = value.indexOf('@');
         int dotIndex = value.lastIndexOf('.');
         return atIndex > 0 && dotIndex > atIndex + 1 && dotIndex < value.length() - 1;
+    }
+
+    private boolean isValidPhoneNumber(String value) {
+        return value.matches("^\\+?[0-9]{10,15}$");
     }
 
     private String generateNumericCode(int length) {

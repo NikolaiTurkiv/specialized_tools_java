@@ -16,6 +16,7 @@
 - перевод просроченных кодов в статус `EXPIRED` по расписанию
 - сохранение сгенерированного кода в файл `otp-codes.txt`
 - отправка `OTP` по `Email`
+- отправка `OTP` по `SMS` через `SMPP`
 - логирование запросов
 
 ## Структура проекта
@@ -97,7 +98,7 @@ curl -X DELETE http://localhost:8080/admin/users/2 \
 
 ### 7. Сгенерировать OTP
 
-Сейчас доступны каналы `FILE` и `EMAIL`.
+Сейчас доступны каналы `FILE`, `EMAIL` и `SMS`.
 
 ```bash
 curl -X POST http://localhost:8080/otp/generate \
@@ -115,6 +116,15 @@ curl -X POST http://localhost:8080/otp/generate \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"operationId":"payment-002","channel":"EMAIL","destination":"user@example.com"}'
+```
+
+Пример отправки по `SMS`:
+
+```bash
+curl -X POST http://localhost:8080/otp/generate \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"operationId":"sms-test-001","channel":"SMS","destination":"+79991234567"}'
 ```
 
 ### 8. Валидировать OTP
@@ -161,3 +171,18 @@ mail.smtp.starttls.enable=true
 ```
 
 Если файл не заполнен, приложение запустится, но отправка по `EMAIL` вернёт ошибку конфигурации.
+
+## Настройка SMS
+
+Перед использованием канала `SMS` заполнить файл [sms.properties](/Users/nikolaj/IdeaProjects/specialized_tools_java/src/main/resources/sms.properties):
+
+```properties
+smpp.host=
+smpp.port=
+smpp.system_id=
+smpp.password=
+smpp.system_type=OTP
+smpp.source_addr=OTPService
+```
+
+Для теста нужен запущенный `SMPPsim` или другой совместимый `SMPP`-эмулятор. Если файл не заполнен или эмулятор не запущен, отправка по `SMS` вернёт ошибку конфигурации или соединения.
