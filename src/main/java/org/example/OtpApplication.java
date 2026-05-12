@@ -13,6 +13,7 @@ import org.example.notification.FileNotificationSender;
 import org.example.notification.NotificationDispatcher;
 import org.example.notification.NotificationSender;
 import org.example.notification.SmsNotificationSender;
+import org.example.notification.TelegramNotificationSender;
 import org.example.security.PasswordHasher;
 import org.example.security.TokenService;
 import org.example.service.AdminService;
@@ -54,6 +55,7 @@ public class OtpApplication {
         senders.put(DeliveryChannel.FILE, new FileNotificationSender(config.otpOutputFile()));
         senders.put(DeliveryChannel.EMAIL, new EmailNotificationSender());
         senders.put(DeliveryChannel.SMS, new SmsNotificationSender());
+        senders.put(DeliveryChannel.TELEGRAM, new TelegramNotificationSender());
         NotificationDispatcher notificationDispatcher = new NotificationDispatcher(senders);
 
         OtpService otpService = new OtpService(otpConfigDao, otpCodeDao, notificationDispatcher);

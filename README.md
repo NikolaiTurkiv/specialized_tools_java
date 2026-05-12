@@ -17,6 +17,7 @@
 - сохранение сгенерированного кода в файл `otp-codes.txt`
 - отправка `OTP` по `Email`
 - отправка `OTP` по `SMS` через `SMPP`
+- отправка `OTP` через `Telegram`
 - логирование запросов
 
 ## Структура проекта
@@ -98,7 +99,7 @@ curl -X DELETE http://localhost:8080/admin/users/2 \
 
 ### 7. Сгенерировать OTP
 
-Сейчас доступны каналы `FILE`, `EMAIL` и `SMS`.
+Сейчас доступны каналы `FILE`, `EMAIL`, `SMS` и `TELEGRAM`.
 
 ```bash
 curl -X POST http://localhost:8080/otp/generate \
@@ -125,6 +126,15 @@ curl -X POST http://localhost:8080/otp/generate \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"operationId":"sms-test-001","channel":"SMS","destination":"+79991234567"}'
+```
+
+Пример отправки в `Telegram`:
+
+```bash
+curl -X POST http://localhost:8080/otp/generate \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"operationId":"telegram-test-001","channel":"TELEGRAM","destination":"Nikolaj"}'
 ```
 
 ### 8. Валидировать OTP
@@ -186,3 +196,25 @@ smpp.source_addr=OTPService
 ```
 
 Для теста нужен запущенный `SMPPsim` или другой совместимый `SMPP`-эмулятор. Если файл не заполнен или эмулятор не запущен, отправка по `SMS` вернёт ошибку конфигурации или соединения.
+
+## Настройка Telegram
+
+Перед использованием канала `TELEGRAM` заполнить файл [telegram.properties](/Users/nikolaj/IdeaProjects/specialized_tools_java/src/main/resources/telegram.properties):
+
+```properties
+telegram.bot.token=YOUR_BOT_TOKEN
+telegram.chat.id=YOUR_CHAT_ID
+telegram.api.base-url=https://api.telegram.org
+```
+
+Чтобы получить `chat.id`:
+
+1. Создать бота через `@BotFather`
+2. Начать с ботом диалог
+3. Открыть:
+
+```text
+https://api.telegram.org/botYOUR_BOT_TOKEN/getUpdates
+```
+
+4. Найти значение `message.chat.id`
