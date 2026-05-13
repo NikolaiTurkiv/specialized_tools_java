@@ -28,6 +28,8 @@
 - `src/main/java/org/example/security` — пароли и токены
 - `src/main/java/org/example/notification` — каналы доставки кодов
 - `src/main/resources/application.properties` — настройки приложения
+- `src/main/resources/db/schema.sql` — SQL-схема БД
+- `src/main/resources/db/seed.sql` — стартовые данные БД
 
 ## Таблицы
 
@@ -36,6 +38,37 @@
 - `otp_service.users`
 - `otp_service.otp_config`
 - `otp_service.otp_codes`
+
+## База данных
+
+В проекте есть два способа подготовки БД:
+
+1. Автоматически при старте приложения
+2. Вручную через SQL-файлы
+
+SQL-файлы:
+
+- [schema.sql](src/main/resources/db/schema.sql)
+- [seed.sql](src/main/resources/db/seed.sql)
+
+### Вариант 1. Автоматически
+
+При запуске приложение само:
+
+- создаёт схему `otp_service`
+- создаёт таблицы
+- добавляет стартовую запись в `otp_config`
+
+### Вариант 2. Вручную через DBeaver или psql
+
+Сначала выполнить `schema.sql`, потом `seed.sql`.
+
+Пример для `psql`:
+
+```bash
+psql -U postgres -d postgres -f src/main/resources/db/schema.sql
+psql -U postgres -d postgres -f src/main/resources/db/seed.sql
+```
 
 ## Запуск
 
@@ -168,8 +201,6 @@ curl -X POST http://localhost:8080/otp/validate \
 
 Перед использованием канала `EMAIL` заполнить файл [email.properties](/Users/nikolaj/IdeaProjects/specialized_tools_java/src/main/resources/email.properties):
 
-у меня отрабатывает только на мобильном интернете
-
 ```properties
 email.username=your_email@example.com
 email.password=your_app_password
@@ -187,10 +218,10 @@ mail.smtp.starttls.enable=true
 Перед использованием канала `SMS` заполнить файл [sms.properties](/Users/nikolaj/IdeaProjects/specialized_tools_java/src/main/resources/sms.properties):
 
 ```properties
-smpp.host=
-smpp.port=
-smpp.system_id=
-smpp.password=
+smpp.host=localhost
+smpp.port=2775
+smpp.system_id=smppclient1
+smpp.password=password
 smpp.system_type=OTP
 smpp.source_addr=OTPService
 ```
@@ -218,3 +249,5 @@ https://api.telegram.org/botYOUR_BOT_TOKEN/getUpdates
 ```
 
 4. Найти значение `message.chat.id`
+
+Если файл не заполнен, приложение запустится, но отправка по `TELEGRAM` вернёт ошибку конфигурации.
