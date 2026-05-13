@@ -48,8 +48,8 @@
 
 SQL-файлы:
 
-- [schema.sql](src/main/resources/db/schema.sql)
-- [seed.sql](src/main/resources/db/seed.sql)
+- `src/main/resources/db/schema.sql`
+- `src/main/resources/db/seed.sql`
 
 ### Вариант 1. Автоматически
 
@@ -138,7 +138,7 @@ curl -X DELETE http://localhost:8080/admin/users/2 \
 curl -X POST http://localhost:8080/otp/generate \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"operationId":"payment-001","channel":"FILE"}'
+  -d '{"operationId":"test-operation-001","channel":"FILE"}'
 ```
 
 После этого код появится в файле `otp-codes.txt` в корне проекта.
@@ -149,7 +149,7 @@ curl -X POST http://localhost:8080/otp/generate \
 curl -X POST http://localhost:8080/otp/generate \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"operationId":"payment-002","channel":"EMAIL","destination":"user@example.com"}'
+  -d '{"operationId":"email-test-001","channel":"EMAIL","destination":"user@example.com"}'
 ```
 
 Пример отправки по `SMS`:
@@ -176,7 +176,7 @@ curl -X POST http://localhost:8080/otp/generate \
 curl -X POST http://localhost:8080/otp/validate \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"operationId":"payment-001","code":"1234"}'
+  -d '{"operationId":"test-operation-001","code":"1234"}'
 ```
 
 ## Как проверить проект
@@ -199,7 +199,7 @@ curl -X POST http://localhost:8080/otp/validate \
 
 ## Настройка Email
 
-Перед использованием канала `EMAIL` заполнить файл [email.properties](/Users/nikolaj/IdeaProjects/specialized_tools_java/src/main/resources/email.properties):
+Перед использованием канала `EMAIL` заполнить файл `src/main/resources/email.properties`:
 
 ```properties
 email.username=your_email@example.com
@@ -215,7 +215,7 @@ mail.smtp.starttls.enable=true
 
 ## Настройка SMS
 
-Перед использованием канала `SMS` заполнить файл [sms.properties](/Users/nikolaj/IdeaProjects/specialized_tools_java/src/main/resources/sms.properties):
+Перед использованием канала `SMS` заполнить файл `src/main/resources/sms.properties`:
 
 ```properties
 smpp.host=localhost
@@ -230,7 +230,7 @@ smpp.source_addr=OTPService
 
 ## Настройка Telegram
 
-Перед использованием канала `TELEGRAM` заполнить файл [telegram.properties](/Users/nikolaj/IdeaProjects/specialized_tools_java/src/main/resources/telegram.properties):
+Перед использованием канала `TELEGRAM` заполнить файл `src/main/resources/telegram.properties`:
 
 ```properties
 telegram.bot.token=YOUR_BOT_TOKEN
@@ -251,3 +251,13 @@ https://api.telegram.org/botYOUR_BOT_TOKEN/getUpdates
 4. Найти значение `message.chat.id`
 
 Если файл не заполнен, приложение запустится, но отправка по `TELEGRAM` вернёт ошибку конфигурации.
+
+## Перед сдачей
+
+Перед публикацией репозитория проверить:
+
+- в `email.properties` не сохранены реальные логины и пароли
+- в `telegram.properties` не сохранены реальные `bot token` и `chat id`
+- в `otp-codes.txt` нет тестовых кодов, файл не попадает в git
+- в репозитории нет локальных IDE-файлов и build-артефактов
+- проект собирается командой `./gradlew build`

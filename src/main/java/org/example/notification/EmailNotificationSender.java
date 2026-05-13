@@ -1,16 +1,20 @@
 package org.example.notification;
 
-import jakarta.mail.*;
+import jakarta.mail.Authenticator;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+import java.util.Properties;
 import org.example.config.PropertiesLoader;
 import org.example.exception.ApiException;
 import org.example.model.DeliveryChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Properties;
-//у меня отрабатывает только с мобильным интернетом, SMTP-диалог не начинается на wifi, провайдер скорее всего блокирует
 public class EmailNotificationSender implements NotificationSender {
     private static final Logger log = LoggerFactory.getLogger(EmailNotificationSender.class);
 
